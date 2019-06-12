@@ -42,6 +42,7 @@ class AnimatedNode {
 
   /* Methods and props used by native Animated impl */
   __isNative: boolean;
+  __isConnected: boolean;
   __nativeTag: ?number;
 
   constructor() {
@@ -140,6 +141,11 @@ class AnimatedNode {
     NativeAnimatedAPI.stopListeningToAnimatedNodeValue(this.__getNativeTag());
   }
 
+  __connectAnimatedNodes() {
+    if (!this.__isNative) {
+      throw new Error('This node cannot be connected natively');
+    }
+  }
   __getNativeTag(): ?number {
     NativeAnimatedHelper.assertNativeAnimatedModule();
     invariant(
@@ -148,11 +154,11 @@ class AnimatedNode {
     );
     if (this.__nativeTag == null) {
       const nativeTag: ?number = NativeAnimatedHelper.generateNewNodeTag();
+      this.__nativeTag = nativeTag;
       NativeAnimatedHelper.API.createAnimatedNode(
         nativeTag,
         this.__getNativeConfig(),
       );
-      this.__nativeTag = nativeTag;
     }
     return this.__nativeTag;
   }
